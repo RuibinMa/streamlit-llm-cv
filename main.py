@@ -2,7 +2,7 @@ import os
 
 import streamlit as st
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from pypdf import PdfReader
 
@@ -22,9 +22,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     reader = PdfReader(pdf_path)
     text = ""
     for page in reader.pages:
-        text += (
-            page.extract_text() + "\n"
-        )  # Add a newline for readability between pages
+        text += page.extract_text() + "\n"
     return text
 
 
@@ -74,7 +72,19 @@ if query := st.chat_input("What do you want to know about Ruibin Ma?"):
     with st.chat_message(human_msg.type):
         st.markdown(human_msg.content)
 
-    response_msg = llm.invoke(st.session_state.messages)
-    with st.chat_message(response_msg.type):
-        response = st.write(response_msg.content)
-    st.session_state.messages.append(response_msg)
+    msg_stream = llm.stream(st.session_state.messages)
+    full_response_content = []
+
+    def convert_to_str_stream(msg_stream):
+        for msg in msg_stream:
+            full_response_content.append(msg.content)
+            yield msg.content
+
+    stream = convert_to_str_stream(msg_stream)
+
+    with st.chat_message("assistant"):
+        response = st.write_stream(stream)
+
+    if full_response_content:
+        response_msg = AIMessage("".join(full_response_content))
+        st.session_state.messages.append(response_msg)
