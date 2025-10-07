@@ -1,4 +1,4 @@
 streamlit
 langchain
-langchain_huggingface
+langchain_openai
 pypdf
