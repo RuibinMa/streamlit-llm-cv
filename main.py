@@ -3,10 +3,10 @@ import os
 import streamlit as st
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+from langchain_openai import ChatOpenAI
 from pypdf import PdfReader
 
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = st.secrets["HF_TOKEN"]
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 
 def extract_text_from_pdf(pdf_path: str) -> str:
@@ -28,15 +28,13 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 
 st.title("Ruibin Ma's Resume Assistant")
 
-llm = ChatHuggingFace(
-    llm=HuggingFaceEndpoint(
-        repo_id="deepseek-ai/DeepSeek-V3.2-Exp",
-        task="text-generation",
-        max_new_tokens=512,
-        do_sample=False,
-        repetition_penalty=1.03,
-        provider="auto",  # let Hugging Face choose the best provider for you
-    )
+llm = ChatOpenAI(
+    model="gpt-4o",
+    temperature=0,
+    max_tokens=512,
+    timeout=None,
+    max_retries=2,
+    api_key=st.secrets["OPENAI_API_KEY"],
 )
 
 if "messages" not in st.session_state:
