@@ -26,7 +26,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     return text
 
 
-st.title("Ruibin Ma's Resume Assistant")
+st.title("Ruibin Ma's Resume Assistant (马睿斌的AI简历助手)")
 
 llm = ChatOpenAI(
     model="gpt-4o",
@@ -40,7 +40,7 @@ llm = ChatOpenAI(
 if "messages" not in st.session_state:
     st.session_state.messages = []
     # Read the CV and add it to the messages
-    CV_PATH = "ruibinma-cv.pdf"
+    CV_PATH = "maruibin-cv-chinese.pdf"
     cv_content = extract_text_from_pdf(CV_PATH)
     print(f"CV content loaded. Length: {len(cv_content)} characters.")
     st.session_state.messages.append(
@@ -58,7 +58,7 @@ for message in st.session_state.messages:
     if isinstance(message, SystemMessage):
         with st.chat_message("assistant"):
             st.markdown(
-                "Ruibin Ma's Resume is loaded in the background. Ask me anything!"
+                "Ruibin Ma's Resume is loaded in the background. Ask me anything! 简历已读取，问我问题吧！"
             )
             continue
     with st.chat_message(message.type):
